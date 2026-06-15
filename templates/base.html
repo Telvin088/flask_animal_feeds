@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Feeds Kenya{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Empowering farmers across East Africa with quality animal feeds.{% endblock %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ── NAVBAR ───────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="{{ url_for('client_home') }}" class="nav-logo">
+      <span class="nav-logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.5-4.5 10-10 10S2 17.5 2 12a10 10 0 0 1 10-10z"/><path d="M12 6v6l4 2"/></svg></span>
+      Feeds<strong>Kenya</strong>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="{{ url_for('client_home') }}"     class="nav-link {% if request.endpoint == 'client_home' %}active{% endif %}">Home</a></li>
+      <li><a href="{{ url_for('client_products') }}" class="nav-link {% if request.endpoint in ['client_products','client_product_detail'] %}active{% endif %}">Products</a></li>
+      <li><a href="{{ url_for('client_events') }}"   class="nav-link {% if request.endpoint in ['client_events','client_event_detail'] %}active{% endif %}">Events</a></li>
+      <li><a href="{{ url_for('client_contact') }}"  class="nav-link {% if request.endpoint == 'client_contact' %}active{% endif %}">Contact</a></li>
+      {% if session.get('role') == 'client' %}
+      <li><a href="{{ url_for('client_orders') }}"   class="nav-link {% if request.endpoint == 'client_orders' %}active{% endif %}">My Orders</a></li>
+      {% endif %}
+    </ul>
+
+    <div class="nav-actions">
+      {% if session.get('user_id') and session.get('role') == 'client' %}
+      <div class="user-menu">
+        <button class="user-avatar-btn">
+          <img src="{{ session.get('profile_picture') and url_for('static', filename=session.get('profile_picture')) or 'https://ui-avatars.com/api/?name=' ~ session.get('username','U')[:2] ~ '&background=1B4332&color=fff&bold=true' }}"
+               onerror="this.src='https://ui-avatars.com/api/?name={{ session.get("username","U")[:2] }}&background=1B4332&color=fff&bold=true'"
+               class="user-avatar" alt="{{ session.get('username') }}">
+          <span class="user-name">{{ session.get('username') }}</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="user-dropdown">
+          <a href="{{ url_for('client_orders') }}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            My Orders
+          </a>
+          <div class="dd-divider"></div>
+          <a href="{{ url_for('auth_logout') }}" class="danger">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Logout
+          </a>
+        </div>
+      </div>
+      {% else %}
+      <a href="{{ url_for('auth_login') }}"  class="btn btn-ghost btn-sm">Log In</a>
+      <a href="{{ url_for('auth_signup') }}" class="btn btn-primary btn-sm">Get Started</a>
+      {% endif %}
+    </div>
+
+    <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Nav -->
+<div class="nav-mobile" id="mobileNav">
+  <a href="{{ url_for('client_home') }}"     class="nav-link {% if request.endpoint == 'client_home' %}active{% endif %}">Home</a>
+  <a href="{{ url_for('client_products') }}" class="nav-link {% if request.endpoint in ['client_products','client_product_detail'] %}active{% endif %}">Products</a>
+  <a href="{{ url_for('client_events') }}"   class="nav-link">Events</a>
+  <a href="{{ url_for('client_contact') }}"  class="nav-link">Contact</a>
+  {% if session.get('role') == 'client' %}
+  <a href="{{ url_for('client_orders') }}"   class="nav-link">My Orders</a>
+  {% endif %}
+  <div class="nav-mobile-footer">
+    {% if session.get('user_id') %}
+    <a href="{{ url_for('auth_logout') }}" class="btn btn-outline btn-sm">Logout</a>
+    {% else %}
+    <a href="{{ url_for('auth_login') }}"  class="btn btn-ghost btn-sm">Log In</a>
+    <a href="{{ url_for('auth_signup') }}" class="btn btn-primary btn-sm">Sign Up</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ── FLASH MESSAGES ─────────────────────────── -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">
+      {% if category == 'success' %}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      {% elif category == 'danger' %}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {% elif category == 'warning' %}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      {% else %}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {% endif %}
+      <span>{{ message }}</span>
+      <button class="flash-close" aria-label="Dismiss">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<!-- ── MAIN CONTENT ──────────────────────────── -->
+<main>{% block content %}{% endblock %}</main>
+
+<!-- ── FOOTER ───────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="{{ url_for('client_home') }}" class="nav-logo">
+        <span class="nav-logo-mark" style="background:rgba(255,255,255,0.12);">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.5-4.5 10-10 10S2 17.5 2 12a10 10 0 0 1 10-10z"/><path d="M12 6v6l4 2"/></svg>
+        </span>
+        Feeds<strong>Kenya</strong>
+      </a>
+      <p>Empowering farmers across East Africa with quality animal feeds and agricultural support for sustainable livelihoods.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="#" aria-label="Twitter"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      </div>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="{{ url_for('client_home') }}#about">About Us</a>
+        <a href="{{ url_for('client_home') }}#services">Services</a>
+        <a href="{{ url_for('client_events') }}">Events</a>
+        <a href="{{ url_for('client_contact') }}">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Products</h4>
+        <a href="{{ url_for('client_products') }}">Browse All</a>
+        <a href="{{ url_for('client_products') }}?q=feeds">Animal Feeds</a>
+        <a href="{{ url_for('client_products') }}?q=seeds">Seeds</a>
+        <a href="{{ url_for('client_products') }}?q=tools">Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <span class="footer-info">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Kenya, East Africa
+        </span>
+        <span class="footer-info">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.4a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.61 16z"/></svg>
+          +254 717 927 780
+        </span>
+        <span class="footer-info">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          feedskenya@gmail.com
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; {{ now.year }} Feeds Kenya. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

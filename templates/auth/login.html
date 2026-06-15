@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In — Feeds Kenya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container" style="top:16px;">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">
+      <span>{{ message }}</span>
+      <button class="flash-close">✕</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<div class="auth-page">
+  <!-- Left panel -->
+  <div class="auth-left">
+    <div class="auth-left-bg"></div>
+    <a href="{{ url_for('client_home') }}" class="auth-logo">
+      <span style="width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </span>
+      Feeds<strong>Kenya</strong>
+    </a>
+    <div class="auth-left-body">
+      <h2>Cultivating dreams,<br><em style="color:var(--accent);">harvesting success.</em></h2>
+      <p>Join thousands of farmers across East Africa who rely on Feeds Kenya for quality animal feeds and agricultural support.</p>
+    </div>
+    <div class="auth-features">
+      <div class="auth-feature"><span class="auth-feature-dot"></span> Free quality animal feeds for eligible farmers</div>
+      <div class="auth-feature"><span class="auth-feature-dot"></span> Expert nutritional consultations</div>
+      <div class="auth-feature"><span class="auth-feature-dot"></span> Farm sustainability workshops &amp; events</div>
+      <div class="auth-feature"><span class="auth-feature-dot"></span> Livestock health clinics</div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="auth-right">
+    <div class="auth-form-wrap">
+      <a href="{{ url_for('client_home') }}" class="auth-back">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to home
+      </a>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-subtitle">Sign in to your Feeds Kenya account</p>
+
+      <form class="auth-form" method="POST" action="{{ url_for('auth_login') }}">
+        <div class="form-group">
+          <label class="form-label" for="username">Username or Email</label>
+          <input class="form-input" type="text" id="username" name="username" placeholder="Enter your username or email" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Log In
+        </button>
+      </form>
+
+      <p class="auth-switch">Don't have an account? <a href="{{ url_for('auth_signup') }}">Create one free</a></p>
+      <p class="auth-switch" style="margin-top:12px;">
+        <a href="{{ url_for('admin_login') }}" style="color:var(--text-muted);font-size:0.8rem;">Admin login →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  if (window.lucide) lucide.createIcons();
+  document.querySelectorAll('.flash-close').forEach(b => b.addEventListener('click', () => b.closest('.flash').remove()));
+</script>
+</body>
+</html>

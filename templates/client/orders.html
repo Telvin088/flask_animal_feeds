@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}My Orders — Feeds Kenya{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="breadcrumb">
+      <a href="{{ url_for('client_home') }}">Home</a>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      My Orders
+    </div>
+    <h1>My Orders</h1>
+    <p>Track all your product requests and their current status.</p>
+  </div>
+</div>
+
+<section class="section-sm">
+  <div class="container">
+
+    <!-- Stats strip -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
+      {% set pending  = orders | selectattr('status', 'equalto', 'Pending')  | list %}
+      {% set approved = orders | selectattr('status', 'equalto', 'Approved') | list %}
+      {% set rejected = orders | selectattr('status', 'equalto', 'Rejected') | list %}
+      <div class="card" style="padding:20px;text-align:center;">
+        <div style="font-size:2rem;font-weight:700;color:var(--text);font-family:var(--font-heading);">{{ orders | length }}</div>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Total Requests</div>
+      </div>
+      <div class="card" style="padding:20px;text-align:center;">
+        <div style="font-size:2rem;font-weight:700;color:var(--success-text);font-family:var(--font-heading);">{{ approved | length }}</div>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Approved</div>
+      </div>
+      <div class="card" style="padding:20px;text-align:center;">
+        <div style="font-size:2rem;font-weight:700;color:var(--warning-text);font-family:var(--font-heading);">{{ pending | length }}</div>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Pending Review</div>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    {% if orders %}
+    <div class="card">
+      <div class="card-body" style="padding:0;">
+        <div class="orders-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+              <tr>
+                <td style="color:var(--text-muted);font-size:0.8rem;">{{ loop.index }}</td>
+                <td><strong>{{ order.product_name }}</strong></td>
+                <td>{{ order.quantity }}</td>
+                <td>{{ order.location }}</td>
+                <td style="white-space:nowrap;font-size:0.82rem;">{{ order.request_date.strftime('%d %b %Y') }}</td>
+                <td>
+                  {% if order.request_type == 'available' %}
+                  <span class="badge badge-primary">Available</span>
+                  {% else %}
+                  <span class="badge badge-muted">Waiting list</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge {{ order.status_class }}">{{ order.status }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      </div>
+      <h3>No orders yet</h3>
+      <p>You haven't made any product requests yet. Browse our catalogue to get started.</p>
+      <a href="{{ url_for('client_products') }}" class="btn btn-primary">Browse Products</a>
+    </div>
+    {% endif %}
+
+    <!-- Request missing product CTA -->
+    <div style="margin-top:40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h4 style="font-size:1rem;margin-bottom:4px;">Need something specific?</h4>
+        <p style="font-size:0.875rem;color:var(--text-muted);">Can't find a product in our catalogue? Request it and we'll try to source it for you.</p>
+      </div>
+      <button class="btn btn-outline" data-modal-open="missingRequestModal">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Request
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- Missing product modal -->
+<div class="modal-overlay" id="missingRequestModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Request a Product</h3>
+      <button class="modal-close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form method="POST" action="{{ url_for('client_request_missing') }}" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input class="form-input" type="text" name="product" placeholder="What product do you need?" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input class="form-input" type="number" name="quantity" value="1" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Delivery Location</label>
+          <input class="form-input" type="text" name="location" placeholder="Your town or county" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Submit Request</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

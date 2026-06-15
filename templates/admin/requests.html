@@ -1,0 +1,96 @@
+{% extends 'admin/base.html' %}
+{% block title %}Requests — Feeds Kenya Admin{% endblock %}
+{% block page_title %}Requests{% endblock %}
+
+{% block content %}
+
+<!-- Stats row -->
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
+  {% for label, val, cls in [('Available', counts.available, 'badge-primary'), ('Waiting List', counts.missing, 'badge-muted'), ('Pending', counts.pending, 'badge-warning'), ('Approved', counts.approved, 'badge-success'), ('Rejected', counts.rejected, 'badge-danger')] %}
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;">
+    <div style="font-size:1.6rem;font-weight:700;color:var(--text);font-family:var(--font-heading);">{{ val }}</div>
+    <div style="font-size:0.72rem;margin-top:4px;"><span class="badge {{ cls }}">{{ label }}</span></div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="panel">
+  <div class="panel-head" style="flex-wrap:wrap;gap:12px;">
+    <span class="panel-title">All Requests</span>
+    <div class="filter-bar" style="margin:0;">
+      <a href="{{ url_for('admin_requests', type='available', status='all') }}" class="f-btn {% if type_f == 'available' %}active{% endif %}">Available Stock</a>
+      <a href="{{ url_for('admin_requests', type='missing',   status='all') }}" class="f-btn {% if type_f == 'missing' %}active{% endif %}">Waiting List</a>
+    </div>
+    <div class="filter-bar" style="margin:0;">
+      <a href="{{ url_for('admin_requests', type=type_f, status='all') }}"      class="f-btn {% if status_f == 'all' %}active{% endif %}">All</a>
+      <a href="{{ url_for('admin_requests', type=type_f, status='Pending') }}"  class="f-btn amber {% if status_f == 'Pending' %}active{% endif %}">Pending</a>
+      <a href="{{ url_for('admin_requests', type=type_f, status='Approved') %}" class="f-btn green {% if status_f == 'Approved' %}active{% endif %}">Approved</a>
+      <a href="{{ url_for('admin_requests', type=type_f, status='Rejected') %}" class="f-btn red   {% if status_f == 'Rejected' %}active{% endif %}">Rejected</a>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    {% if requests %}
+    <table class="a-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Client</th>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Location</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+        <tr>
+          <td class="td-muted">{{ loop.index }}</td>
+          <td>
+            <div class="td-name">{{ r.name }}</div>
+            <div class="td-muted">{{ r.email }}</div>
+            {% if r.phone %}<div class="td-muted">{{ r.phone }}</div>{% endif %}
+          </td>
+          <td><strong>{{ r.product_name }}</strong></td>
+          <td>{{ r.quantity }}</td>
+          <td>{{ r.location }}</td>
+          <td class="td-muted" style="white-space:nowrap;">{{ r.request_date.strftime('%d %b %Y') }}</td>
+          <td><span class="badge {{ r.status_class }}">{{ r.status }}</span></td>
+          <td>
+            {% if r.status == 'Pending' %}
+            <div class="actions">
+              <form method="POST" action="{{ url_for('admin_approve_request', req_id=r.id) }}" style="display:inline;">
+                <button class="btn btn-sm" style="background:var(--success-bg);color:var(--success-text);border:1px solid #A7F3D0;padding:5px 12px;border-radius:var(--radius-sm);"
+                        onclick="return confirm('Approve this request?')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Approve
+                </button>
+              </form>
+              <form method="POST" action="{{ url_for('admin_reject_request', req_id=r.id) }}" style="display:inline;">
+                <button class="btn btn-sm" style="background:var(--danger-bg);color:var(--danger-text);border:1px solid #FECACA;padding:5px 12px;border-radius:var(--radius-sm);"
+                        onclick="return confirm('Reject this request?')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  Reject
+                </button>
+              </form>
+            </div>
+            {% else %}
+            <span style="font-size:0.78rem;color:var(--text-muted);">— No actions</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div style="padding:48px;text-align:center;color:var(--text-muted);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 12px;display:block;opacity:0.4;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <p>No requests found for the selected filters.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Products — Feeds Kenya{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="breadcrumb">
+      <a href="{{ url_for('client_home') }}">Home</a>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      Products
+    </div>
+    <h1>Our Products</h1>
+    <p>Browse our range of quality animal feeds and agricultural inputs available for request.</p>
+  </div>
+</div>
+
+<section class="section-sm">
+  <div class="container">
+
+    <!-- Search + Info bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px;">
+      <form action="{{ url_for('client_products') }}" method="GET" class="search-bar" style="max-width:400px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;color:var(--text-muted);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="q" placeholder="Search products…" value="{{ search }}">
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+      </form>
+      <div style="font-size:0.875rem;color:var(--text-muted);">
+        {% if search %}
+        Results for <strong style="color:var(--text);">"{{ search }}"</strong> &mdash;
+        <a href="{{ url_for('client_products') }}" style="color:var(--primary);">Clear</a>
+        &bull;
+        {% endif %}
+        <strong style="color:var(--text);">{{ products.total }}</strong> product{{ 's' if products.total != 1 else '' }}
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    {% if products.items %}
+    <div class="product-grid">
+      {% for product in products.items %}
+      <div class="product-card">
+        <a href="{{ url_for('client_product_detail', product_id=product.id) }}" class="product-img">
+          <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+        </a>
+        <div class="product-card-body">
+          <a href="{{ url_for('client_product_detail', product_id=product.id) }}" class="product-name" style="display:block;">{{ product.name }}</a>
+          {% if product.description %}
+          <div class="product-desc">{{ product.description }}</div>
+          {% endif %}
+        </div>
+        <div class="product-card-foot">
+          {% if product.in_stock %}
+          <span class="badge badge-success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            {{ product.units }} in stock
+          </span>
+          {% else %}
+          <span class="badge badge-danger">Out of stock</span>
+          {% endif %}
+          <a href="{{ url_for('client_product_detail', product_id=product.id) }}" class="btn btn-primary btn-sm">View & Request</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if products.pages > 1 %}
+    <div class="pagination">
+      {% if products.has_prev %}
+      <a href="{{ url_for('client_products', page=products.prev_num, q=search) }}" class="page-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg>
+      </a>
+      {% else %}
+      <span class="page-link disabled"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg></span>
+      {% endif %}
+      {% for page_num in products.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+        <a href="{{ url_for('client_products', page=page_num, q=search) }}" class="page-link {% if page_num == products.page %}active{% endif %}">{{ page_num }}</a>
+        {% else %}
+        <span class="page-link disabled">…</span>
+        {% endif %}
+      {% endfor %}
+      {% if products.has_next %}
+      <a href="{{ url_for('client_products', page=products.next_num, q=search) }}" class="page-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      {% else %}
+      <span class="page-link disabled"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="9 18 15 12 9 6"/></svg></span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      {% if search %}
+      <h3>No results for "{{ search }}"</h3>
+      <p>Try a different search term or browse all products.</p>
+      <a href="{{ url_for('client_products') }}" class="btn btn-primary">Browse All Products</a>
+      {% else %}
+      <h3>No products available</h3>
+      <p>Check back soon — new products are added regularly.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Request missing product notice -->
+    <div style="margin-top:48px;background:var(--primary-50);border:1px solid var(--primary-100);border-radius:var(--radius);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h4 style="font-size:1rem;margin-bottom:4px;">Can't find what you need?</h4>
+        <p style="font-size:0.875rem;color:var(--text-muted);">Submit a request for a product that isn't listed and we'll source it for you.</p>
+      </div>
+      {% if session.get('role') == 'client' %}
+      <button class="btn btn-primary" data-modal-open="missingModal">Request a Product</button>
+      {% else %}
+      <a href="{{ url_for('auth_login') }}" class="btn btn-primary">Log in to Request</a>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<!-- Missing product modal -->
+{% if session.get('role') == 'client' %}
+<div class="modal-overlay" id="missingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Request a Missing Product</h3>
+      <button class="modal-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <form method="POST" action="{{ url_for('client_request_missing') }}" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input class="form-input" type="text" name="product" placeholder="e.g. Dairy Meal Premium" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Quantity (bags/kg)</label>
+          <input class="form-input" type="number" name="quantity" value="1" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Location</label>
+          <input class="form-input" type="text" name="location" placeholder="Town / County" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Submit Request</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
