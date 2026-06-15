@@ -1,0 +1,32 @@
+.new-products-section {
+    height: 320px;
+    width: 700px;
+    /* border: 2px solid black; */
+    margin: 50px auto;
+}
+
+.new-products-section h4 {
+    margin-left: 70px;
+}
+
+.new-event-section {
+    height: 500px;
+    width: 700px;
+    /* border: 2px solid black; */
+    margin: 30px auto;
+}
+
+.new-event-section h4 {
+    margin-left: 70px;
+}
+
+.top-ordered-product {
+    height: 400px;
+    width: 700px;
+    /* border: 2px solid black; */
+    margin: 50px auto;
+}
+
+.top-ordered-product h4 {
+    margin-left: 70px;
+}
