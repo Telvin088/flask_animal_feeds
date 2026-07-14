@@ -3,3 +3,9 @@ channel = "stable-25_05"
 
 [agent]
 expertMode = true
+
+[workflows]
+run = "python app.py"
+
+[deployment]
+run = "gunicorn app:app"

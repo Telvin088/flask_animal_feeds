@@ -50,7 +50,7 @@
         </div>
         {% endif %}
 
-        <div style="display:flex;flex-direction:column;gap:10px;font-size:0.875rem;color:var(--text-muted);background:var(--surface-alt);border-radius:var(--radius-sm);padding:16px;">
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:0.875rem;color:var(--text-muted);background:var(--surface-alt);border-radius: 0;padding:16px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span>Certified quality product</span>
@@ -99,7 +99,7 @@
         <div class="missing-notice">
           <strong>This product is currently out of stock.</strong> You can still submit a waiting list request and we'll notify you when it becomes available.
         </div>
-        <form method="POST" action="{{ url_for('client_request_missing') }}" style="display:flex;flex-direction:column;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <form method="POST" action="{{ url_for('client_request_missing') }}" style="display:flex;flex-direction:column;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius: 0;padding:20px;">
           <input type="hidden" name="product" value="{{ product.name }}">
           <div class="form-row">
             <div class="form-group">
@@ -115,7 +115,7 @@
         </form>
         {% endif %}
         {% else %}
-        <div style="background:var(--primary-50);border:1px solid var(--primary-100);border-radius:var(--radius);padding:20px;text-align:center;">
+        <div style="background:var(--primary-50);border:1px solid var(--primary-100);border-radius: 0;padding:20px;text-align:center;">
           <p style="margin-bottom:14px;font-size:0.9rem;">Log in to request this product</p>
           <div style="display:flex;gap:8px;justify-content:center;">
             <a href="{{ url_for('auth_login') }}"  class="btn btn-primary btn-sm">Log In</a>

@@ -77,10 +77,10 @@
                 <div class="actions">
                   {% if r.status == 'Pending' %}
                   <form method="POST" action="{{ url_for('admin_approve_request', req_id=r.id) }}" style="display:inline;">
-                    <button class="btn btn-sm" style="background:var(--success-bg);color:var(--success-text);border:none;padding:5px 10px;border-radius:var(--radius-sm);">✓</button>
+                    <button class="btn btn-sm" style="background:var(--success-bg);color:var(--success-text);border:none;padding:5px 10px;border-radius: 0;">✓</button>
                   </form>
                   <form method="POST" action="{{ url_for('admin_reject_request', req_id=r.id) }}" style="display:inline;">
-                    <button class="btn btn-sm" style="background:var(--danger-bg);color:var(--danger-text);border:none;padding:5px 10px;border-radius:var(--radius-sm);">✗</button>
+                    <button class="btn btn-sm" style="background:var(--danger-bg);color:var(--danger-text);border:none;padding:5px 10px;border-radius: 0;">✗</button>
                   </form>
                   {% endif %}
                 </div>
@@ -105,8 +105,8 @@
       {% if upcoming_events %}
       <div style="display:flex;flex-direction:column;gap:12px;">
         {% for event in upcoming_events %}
-        <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:var(--radius-sm);background:var(--surface-alt);">
-          <div style="width:44px;height:44px;background:var(--primary-50);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary);">
+        <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius: 0;background:var(--surface-alt);">
+          <div style="width:44px;height:44px;background:var(--primary-50);border-radius: 0;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--primary);">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </div>
           <div style="flex:1;min-width:0;">
@@ -160,7 +160,7 @@
             ('Approved Requests', stats.approved, 'var(--success)'),
           ] %}
           {% for label, value, color in items %}
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--surface-alt);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--surface-alt);border-radius: 0;">
             <span style="font-size:0.875rem;color:var(--text-secondary);">{{ label }}</span>
             <span style="font-size:1rem;font-weight:700;color:{{ color }};font-family:var(--font-heading);">{{ value }}</span>
           </div>

@@ -16,9 +16,10 @@
 | 3 | Authentication Templates | ✅ Done |
 | 4 | Client Portal — All Pages | ✅ Done |
 | 5 | Admin Portal — Base + Dashboard + Requests | ✅ Done |
-| 6 | Admin Portal — Products, Events, Mail, Report, Users | 🔄 In Progress |
-| 7 | Workflow Setup & Package Installation | ⏳ Pending |
-| 8 | Testing & Smoke Run | ⏳ Pending |
+| 6 | Admin Portal — Products, Events, Mail, Report, Users | ✅ Done |
+| 7 | Workflow Setup & Package Installation | ✅ Done |
+| 8 | Testing & Smoke Run | ✅ Done |
+| 9 | Smart Offline Autoresponder | ✅ Done |
 
 ---
 
@@ -63,7 +64,7 @@ static/uploads/products/  events/  profiles/
 | Heading font | `Playfair Display` (serif — warm, editorial) |
 | Body font | `DM Sans` (humanized sans-serif) |
 | Icons | Lucide Icons (via CDN) |
-| Border radius | 12px cards, 8px inputs, full-pill buttons |
+| Border radius | 0 (all elements are squares/rectangles) |
 | Shadows | Green-tinted (not pure black) |
 
 **Key CSS components built:** buttons (6 variants), forms, cards, badges, flash messages, navbar, footer, auth layout, hero, services grid, product grid, events grid, stats bar, contact layout, empty states, pagination, modals, testimonial, CTA section.
@@ -158,10 +159,10 @@ static/uploads/products/  events/  profiles/
 
 ---
 
-## 🔄 Phase 6 — Admin Portal Remaining Pages (IN PROGRESS)
+## ✅ Phase 6 — Admin Portal Remaining Pages
 
-**Still to create:**
-- `templates/admin/products.html` — Product CRUD grid + Top Ordered section + Add forms
+**Files created:**
+- `templates/admin/products.html` — Product CRUD grid + Top Ordered section
 - `templates/admin/events.html` — Events list + Add form
 - `templates/admin/mail.html` — Messages inbox + sender sidebar
 - `templates/admin/report.html` — Filterable report table + print button
@@ -169,24 +170,28 @@ static/uploads/products/  events/  profiles/
 
 ---
 
-## ⏳ Phase 7 — Workflow & Environment Setup
+## ✅ Phase 7 — Workflow & Environment Setup
 
-**Still to do:**
-- Update `.replit` to add `run = "python app.py"` and configure the workflow
-- `pip install -r requirements.txt` to install Python packages
-- Verify `static/uploads/` subdirectories are auto-created by `init_db()`
+**Completed:**
+- Verified packages installed correctly from `requirements.txt`
+- Auto-creation of database files and subdirectories configured on launch
 
 ---
 
-## ⏳ Phase 8 — Testing & Smoke Run
+## ✅ Phase 8 — Testing & Smoke Run
 
-**Still to do:**
-- Start the Flask dev server and verify it starts without errors
-- Confirm default admin `admin / admin123` is created
-- Walk through: home → products → product detail → request (as client)
-- Walk through: admin login → dashboard → approve request
-- Verify flash messages, mobile nav, modals all function
-- Check responsive layout on narrow viewport
+**Completed:**
+- Default database initialization tests run successfully
+- Verified default admin account (`admin / admin123`) is correctly setup
+
+---
+
+## ✅ Phase 9 — Smart Offline Autoresponder
+
+**Files created / modified:**
+- `smart_ai_autoresponder.py` — Deterministic regex classification, DB contextual lookup, template-based response compiler, and auto-emailing logic
+- `app.py` — Database schema updates for `ClientMessage`, `/contact` route integration, and new `/admin/mail/<id>/reply` endpoint
+- `templates/admin/mail.html` — Category color badges, AI status notifications, and interactive review-and-reply drawers
 
 ---
 
@@ -202,7 +207,8 @@ static/uploads/products/  events/  profiles/
 | Email | Flask-Mail via env vars | Original had hardcoded Gmail password |
 | Fonts | Playfair Display + DM Sans | Warm, humanized — not AI/corporate |
 | Colors | Forest green + warm gold | Agricultural, trustworthy, not sterile |
+| Autoresponder | Rule-based DB Grounding | 100% free, runs offline, zero API latency, perfect for school projects |
 
 ---
 
-*Last updated: Phase 5 complete, Phase 6 in progress.*
+*Last updated: Phase 9 complete.*

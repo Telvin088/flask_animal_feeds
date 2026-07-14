@@ -27,7 +27,7 @@
 
       <!-- Main content -->
       <div>
-        <img src="{{ event.image_url }}" alt="{{ event.topic }}" style="width:100%;border-radius:var(--radius-lg);aspect-ratio:16/9;object-fit:cover;margin-bottom:36px;box-shadow:var(--shadow);">
+        <img src="{{ event.image_url }}" alt="{{ event.topic }}" style="width:100%;border-radius: 0;aspect-ratio:16/9;object-fit:cover;margin-bottom:36px;box-shadow:var(--shadow);">
         <div style="font-family:var(--font-body);font-size:1rem;line-height:1.85;color:var(--text-secondary);">
           {{ event.text | replace('\n', '<br>') | safe }}
         </div>
@@ -83,8 +83,8 @@
           <h4 style="font-size:0.95rem;font-family:var(--font-body);margin-bottom:14px;color:var(--text);">Related Events</h4>
           <div style="display:flex;flex-direction:column;gap:12px;">
             {% for r in related %}
-            <a href="{{ url_for('client_event_detail', event_id=r.id) }}" style="display:flex;gap:10px;align-items:center;padding:8px;border-radius:var(--radius-sm);transition:background var(--transition);" onmouseover="this.style.background='var(--primary-50)'" onmouseout="this.style.background='transparent'">
-              <img src="{{ r.image_url }}" alt="{{ r.topic }}" style="width:48px;height:48px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0;">
+            <a href="{{ url_for('client_event_detail', event_id=r.id) }}" style="display:flex;gap:10px;align-items:center;padding:8px;border-radius: 0;transition:background var(--transition);" onmouseover="this.style.background='var(--primary-50)'" onmouseout="this.style.background='transparent'">
+              <img src="{{ r.image_url }}" alt="{{ r.topic }}" style="width:48px;height:48px;border-radius: 0;object-fit:cover;flex-shrink:0;">
               <div>
                 <div style="font-size:0.82rem;font-weight:600;color:var(--text);">{{ r.topic[:40] }}{% if r.topic|length > 40 %}…{% endif %}</div>
                 <div style="font-size:0.75rem;color:var(--text-muted);">{{ r.date.strftime('%d %b %Y') }}</div>

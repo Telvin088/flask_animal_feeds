@@ -1,0 +1,139 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Messages — Feeds Kenya{% endblock %}
+{% block page_title %}Inbox{% endblock %}
+
+{% block content %}
+
+<div class="admin-grid col-2-1" style="grid-template-columns: 1fr 300px;">
+  
+  <!-- Inbox List -->
+  <div class="panel">
+    <div class="panel-head">
+      <h3 class="panel-title">Client Messages</h3>
+      <div class="panel-actions">
+        <span class="badge badge-outline">{{ messages|length }} Messages</span>
+      </div>
+    </div>
+    <div class="panel-body" style="padding:0;">
+      <div class="messages-list">
+        {% for m in messages %}
+        <div class="msg-item {% if not m.is_read %}unread{% endif %}" style="border-bottom: 1px solid #e5e5e0; padding: 20px; background: {% if not m.is_read %}#f0f5f0{% else %}white{% endif %}; margin-bottom: 10px;">
+          <div class="msg-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="msg-name" style="font-weight:700; color:var(--primary-dark);">{{ m.name }}</span>
+              
+              <!-- Category Badge -->
+              <span class="badge" style="
+                font-size: 0.7rem; 
+                padding: 2px 8px; 
+                border-radius: 0; 
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                background: {% if m.category == 'Stock' %}#e9c46a{% elif m.category == 'Order' %}#2a9d8f{% elif m.category == 'Return' %}#e76f51{% else %}#6c757d{% endif %}; 
+                color: white;
+              ">
+                {{ m.category }}
+              </span>
+
+              <!-- AI Status Badge -->
+              {% if m.ai_status == 'Auto-Sent' %}
+                <span class="badge" style="font-size:0.7rem; padding: 2px 8px; border-radius: 0; font-weight:600; background:#1B4332; color:white;">
+                  ✓ Auto-Sent
+                </span>
+              {% elif m.ai_status == 'Replied' %}
+                <span class="badge" style="font-size:0.7rem; padding: 2px 8px; border-radius: 0; font-weight:600; background:#6c757d; color:white;">
+                  ✓ Replied
+                </span>
+              {% elif m.ai_status == 'Draft Generated' or m.ai_status == 'Pending' %}
+                <span class="badge" style="font-size:0.7rem; padding: 2px 8px; border-radius: 0; font-weight:600; background:#D4A017; color:white; animation: pulse 2s infinite;">
+                  ⚡ Draft Ready
+                </span>
+              {% endif %}
+            </div>
+            <span class="msg-time" style="font-size:0.8rem; color:var(--text-muted);">{{ m.created_at.strftime('%b %d, %H:%M') }}</span>
+          </div>
+          
+          <div class="msg-subj" style="font-weight:700; font-family:'Playfair Display', serif; font-size:1.1rem; color:#333; margin-bottom:8px;">{{ m.subject }}</div>
+          <div class="msg-body" style="font-size:0.95rem; line-height:1.5; color:#555; margin-bottom:12px; white-space:pre-line;">{{ m.message }}</div>
+          
+          <div class="msg-email" style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center; gap:4px; margin-bottom:15px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            {{ m.email }}
+          </div>
+
+          <!-- AI Response / Action Panel -->
+          {% if m.ai_status == 'Auto-Sent' or m.ai_status == 'Replied' %}
+            <div style="background:#f4f6f4; border-left:3px solid var(--primary-mid); padding:12px 15px; margin-top:10px;">
+              <div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--primary-dark); margin-bottom:5px; display:flex; align-items:center; gap:4px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                Sent Email Body:
+              </div>
+              <div style="font-size:0.9rem; line-height:1.4; color:#555; white-space:pre-line; font-style:italic;">{{ m.ai_draft }}</div>
+            </div>
+          {% elif m.ai_status == 'Draft Generated' or m.ai_status == 'Pending' %}
+            <div style="background:#fcf9f2; border-left:3px solid var(--accent); padding:15px; margin-top:10px; border-top:1px solid #f0e6cc; border-right:1px solid #f0e6cc; border-bottom:1px solid #f0e6cc;">
+              <div style="font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--accent); margin-bottom:8px; display:flex; align-items:center; gap:4px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Agri-Responder Draft (Review & Send):
+              </div>
+              <form action="{{ url_for('admin_reply_message', msg_id=m.id) }}" method="POST">
+                <textarea name="reply_body" style="width:100%; min-height:120px; padding:10px; border:1px solid #d4c8af; border-radius:0; font-family:inherit; font-size:0.9rem; line-height:1.4; color:#333; background:white; margin-bottom:10px; resize:vertical;">{{ m.ai_draft }}</textarea>
+                <button type="submit" class="btn btn-sm btn-primary" style="background:var(--primary-dark); border-color:var(--primary-dark); color:white; padding:6px 12px; font-size:0.8rem; font-weight:600; text-transform:uppercase; border-radius:0; cursor:pointer;">
+                  Send Reply Email
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+        
+        {% if not messages %}
+        <div class="empty-state" style="padding:60px 0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted); opacity:0.3; margin-bottom:12px;"><path d="M22 17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5C2 7 4 5 6.5 5H18c2.2 0 4 1.8 4 4v8Z"/><path d="m2 9.5 10 7 10-7"/></svg>
+          <p style="color:var(--text-muted);">Your inbox is empty.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar: Recent Clients -->
+  <div class="side-stack">
+    <div class="panel">
+      <div class="panel-head">
+        <h3 class="panel-title">Recent Clients</h3>
+      </div>
+      <div class="panel-body">
+        <div class="user-row-list">
+          {% for u in recent_users %}
+          <div class="u-row">
+            <img src="{{ u.avatar_url }}" alt="">
+            <div class="u-row-info">
+              <div class="name">{{ u.username }}</div>
+              <div class="email">{{ u.email }}</div>
+            </div>
+            <div class="u-row-date">{{ u.created_at.strftime('%b %d') }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        <div style="margin-top:16px; text-align:center;">
+          <a href="{{ url_for('admin_users') }}" class="btn btn-ghost btn-sm" style="width:100%;">View All Clients</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Admin Info -->
+    <div class="panel" style="margin-top:20px; background:var(--primary-dark); color:white; border:none;">
+      <div class="panel-body" style="text-align:center; padding:30px 20px;">
+        <img src="{{ admin_user.avatar_url }}" alt="" style="width:64px; height:64px; border-radius: 0; margin-bottom:12px; border:3px solid rgba(255,255,255,0.1);">
+        <h4 style="color:white; margin-bottom:4px;">{{ admin_user.username }}</h4>
+        <p style="color:rgba(255,255,255,0.5); font-size:0.75rem; letter-spacing:0.05em; text-transform:uppercase;">Primary Administrator</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

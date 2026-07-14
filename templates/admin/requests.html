@@ -7,7 +7,7 @@
 <!-- Stats row -->
 <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;">
   {% for label, val, cls in [('Available', counts.available, 'badge-primary'), ('Waiting List', counts.missing, 'badge-muted'), ('Pending', counts.pending, 'badge-warning'), ('Approved', counts.approved, 'badge-success'), ('Rejected', counts.rejected, 'badge-danger')] %}
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius: 0;padding:14px;text-align:center;">
     <div style="font-size:1.6rem;font-weight:700;color:var(--text);font-family:var(--font-heading);">{{ val }}</div>
     <div style="font-size:0.72rem;margin-top:4px;"><span class="badge {{ cls }}">{{ label }}</span></div>
   </div>
@@ -24,8 +24,8 @@
     <div class="filter-bar" style="margin:0;">
       <a href="{{ url_for('admin_requests', type=type_f, status='all') }}"      class="f-btn {% if status_f == 'all' %}active{% endif %}">All</a>
       <a href="{{ url_for('admin_requests', type=type_f, status='Pending') }}"  class="f-btn amber {% if status_f == 'Pending' %}active{% endif %}">Pending</a>
-      <a href="{{ url_for('admin_requests', type=type_f, status='Approved') %}" class="f-btn green {% if status_f == 'Approved' %}active{% endif %}">Approved</a>
-      <a href="{{ url_for('admin_requests', type=type_f, status='Rejected') %}" class="f-btn red   {% if status_f == 'Rejected' %}active{% endif %}">Rejected</a>
+      <a href="{{ url_for('admin_requests', type=type_f, status='Approved') }}" class="f-btn green {% if status_f == 'Approved' %}active{% endif %}">Approved</a>
+      <a href="{{ url_for('admin_requests', type=type_f, status='Rejected') }}" class="f-btn red   {% if status_f == 'Rejected' %}active{% endif %}">Rejected</a>
     </div>
   </div>
 
@@ -62,14 +62,14 @@
             {% if r.status == 'Pending' %}
             <div class="actions">
               <form method="POST" action="{{ url_for('admin_approve_request', req_id=r.id) }}" style="display:inline;">
-                <button class="btn btn-sm" style="background:var(--success-bg);color:var(--success-text);border:1px solid #A7F3D0;padding:5px 12px;border-radius:var(--radius-sm);"
+                <button class="btn btn-sm" style="background:var(--success-bg);color:var(--success-text);border:1px solid #A7F3D0;padding:5px 12px;border-radius: 0;"
                         onclick="return confirm('Approve this request?')">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   Approve
                 </button>
               </form>
               <form method="POST" action="{{ url_for('admin_reject_request', req_id=r.id) }}" style="display:inline;">
-                <button class="btn btn-sm" style="background:var(--danger-bg);color:var(--danger-text);border:1px solid #FECACA;padding:5px 12px;border-radius:var(--radius-sm);"
+                <button class="btn btn-sm" style="background:var(--danger-bg);color:var(--danger-text);border:1px solid #FECACA;padding:5px 12px;border-radius: 0;"
                         onclick="return confirm('Reject this request?')">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   Reject

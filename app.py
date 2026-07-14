@@ -153,6 +153,11 @@ class ClientMessage(db.Model):
     message    = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_read    = db.Column(db.Boolean, default=False)
+    
+    # AI Autoresponder fields
+    category   = db.Column(db.String(50), default='General')
+    ai_status  = db.Column(db.String(50), default='Pending')
+    ai_draft   = db.Column(db.Text)
 
 # ─────────────────────────────────────────────────────────────
 # Helpers
@@ -455,6 +460,14 @@ def client_contact():
         )
         db.session.add(msg)
         db.session.commit()
+        
+        # Trigger Smart AI Autoresponder
+        try:
+            from smart_ai_autoresponder import process_message_with_ai
+            process_message_with_ai(msg)
+        except Exception as e:
+            app.logger.error(f"AI autoresponder failed: {e}")
+
         flash('Message sent! We will get back to you within 24 hours.', 'success')
         return redirect(url_for('client_contact'))
     return render_template('client/contact.html')
@@ -646,6 +659,29 @@ def admin_mail():
     db.session.commit()
     return render_template('admin/mail.html', messages=messages,
                            admin_user=admin_user, recent_users=recent_users)
+
+
+@app.route('/admin/mail/<int:msg_id>/reply', methods=['POST'])
+@admin_required
+def admin_reply_message(msg_id):
+    msg_obj = ClientMessage.query.get_or_404(msg_id)
+    reply_body = request.form.get('reply_body', '').strip()
+    if not reply_body:
+        flash('Reply content cannot be empty.', 'danger')
+        return redirect(url_for('admin_mail'))
+    
+    try:
+        subject = f"Re: {msg_obj.subject}"
+        email_msg = Message(subject, recipients=[msg_obj.email], body=reply_body)
+        mail.send(email_msg)
+        msg_obj.ai_status = 'Replied'
+        msg_obj.ai_draft = reply_body
+        db.session.commit()
+        flash('Reply sent successfully.', 'success')
+    except Exception as e:
+        app.logger.error(f"Failed to send email: {e}")
+        flash(f'Failed to send email: {e}', 'danger')
+    return redirect(url_for('admin_mail'))
 
 
 @app.route('/admin/report')

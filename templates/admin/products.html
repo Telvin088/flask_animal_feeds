@@ -1,0 +1,164 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Products — Feeds Kenya{% endblock %}
+{% block page_title %}Products & Inventory{% endblock %}
+
+{% block content %}
+
+<div class="admin-grid col-2-1">
+  
+  <!-- Product List -->
+  <div class="panel">
+    <div class="panel-head">
+      <h3 class="panel-title">All Products</h3>
+      <div class="panel-actions">
+        <span class="badge badge-outline">{{ products|length }} Items</span>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="prod-grid">
+        {% for p in products %}
+        <div class="prod-card">
+          <div class="prod-card-img">
+            <img src="{{ p.image_url }}" alt="{{ p.name }}">
+          </div>
+          <div class="prod-card-body">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <h4>{{ p.name }}</h4>
+              {% if p.is_featured %}
+              <span class="badge badge-accent" style="font-size:0.6rem; padding:2px 5px;">Featured</span>
+              {% endif %}
+            </div>
+            <p class="td-muted" style="margin-top:4px;">{{ p.units }} units in stock</p>
+          </div>
+          <div class="prod-card-foot">
+            <button class="btn btn-ghost btn-sm" onclick="editProduct('{{ p.id }}', '{{ p.name|escape }}', '{{ p.units }}', '{{ p.description|escape }}', {{ 'true' if p.is_featured else 'false' }})" style="padding:6px 10px; font-size:0.75rem;">Edit</button>
+            <form action="{{ url_for('admin_delete_product', pid=p.id) }}" method="POST" onsubmit="return confirm('Delete this product?');" style="display:inline;">
+              <button type="submit" class="btn btn-outline btn-sm" style="padding:6px 10px; font-size:0.75rem; color:var(--danger); border-color:var(--danger-bg);">Delete</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% if not products %}
+      <div class="empty-state" style="padding:40px 0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted); opacity:0.3; margin-bottom:12px;"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+        <p style="color:var(--text-muted);">No products found in inventory.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Side Actions -->
+  <div class="side-stack">
+    
+    <!-- Add/Edit Product -->
+    <div class="form-panel" id="productFormPanel">
+      <h3 id="formTitle">Add New Product</h3>
+      <form action="{{ url_for('admin_add_product') }}" method="POST" enctype="multipart/form-data" id="mainProductForm">
+        <div class="form-stack">
+          <div class="form-group">
+            <label class="form-label">Product Name</label>
+            <input type="text" name="name" class="form-control" required placeholder="e.g. Dairy Meal Plus">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Available Units</label>
+            <input type="number" name="units" class="form-control" required min="0" value="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3" placeholder="Describe the product..."></textarea>
+          </div>
+          <div class="form-group">
+             <label class="checkbox-label" style="display:flex; align-items:center; gap:8px; font-size:0.875rem; cursor:pointer;">
+                <input type="checkbox" name="is_featured" value="y">
+                <span>Feature on homepage</span>
+             </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Product Image</label>
+            <label class="file-zone">
+              <input type="file" name="image" accept="image/*" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Click to upload image</span>
+            </label>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button type="submit" class="btn btn-primary" style="flex:1;" id="submitBtn">Save Product</button>
+            <button type="button" class="btn btn-ghost" id="cancelBtn" style="display:none;" onclick="resetProductForm()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Top Ordered -->
+    <div class="panel" style="margin-top:20px;">
+      <div class="panel-head">
+        <h3 class="panel-title">Top Ordered Items</h3>
+      </div>
+      <div class="panel-body">
+        <div class="user-row-list">
+          {% for t in top_ordered %}
+          <div class="u-row">
+            <img src="{{ t.image_url }}" alt="">
+            <div class="u-row-info">
+              <div class="name">{{ t.name }}</div>
+            </div>
+            <form action="{{ url_for('admin_delete_top_ordered', tid=t.id) }}" method="POST">
+              <button type="submit" class="btn btn-ghost" style="color:var(--danger); padding:4px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <form action="{{ url_for('admin_add_top_ordered') }}" method="POST" enctype="multipart/form-data" style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+          <h4 style="font-size:0.8rem; margin-bottom:10px;">Add Quick Link Item</h4>
+          <div class="form-stack">
+            <input type="text" name="name" class="form-control" placeholder="Item name" required>
+            <input type="file" name="image" class="form-control" accept="image/*" required>
+            <button type="submit" class="btn btn-outline btn-sm">Add Item</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function editProduct(id, name, units, desc, isFeatured) {
+    const form = document.getElementById('mainProductForm');
+    const title = document.getElementById('formTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    form.action = `/admin/products/${id}/edit`;
+    title.innerText = "Edit Product";
+    submitBtn.innerText = "Update Product";
+    cancelBtn.style.display = "block";
+
+    form.querySelector('input[name="name"]').value = name;
+    form.querySelector('input[name="units"]').value = units;
+    form.querySelector('textarea[name="description"]').value = desc;
+    form.querySelector('input[name="is_featured"]').checked = isFeatured;
+    
+    document.getElementById('productFormPanel').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetProductForm() {
+    const form = document.getElementById('mainProductForm');
+    const title = document.getElementById('formTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    form.action = "{{ url_for('admin_add_product') }}";
+    title.innerText = "Add New Product";
+    submitBtn.innerText = "Save Product";
+    cancelBtn.style.display = "none";
+    form.reset();
+  }
+</script>
+{% endblock %}
