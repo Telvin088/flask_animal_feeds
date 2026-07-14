@@ -470,7 +470,11 @@ def client_contact():
 
         flash('Message sent! We will get back to you within 24 hours.', 'success')
         return redirect(url_for('client_contact'))
-    return render_template('client/contact.html')
+        
+    user_info = None
+    if 'user_id' in session and session.get('role') == 'client':
+        user_info = User.query.get(session['user_id'])
+    return render_template('client/contact.html', user_info=user_info)
 
 # ─────────────────────────────────────────────────────────────
 # ADMIN ROUTES

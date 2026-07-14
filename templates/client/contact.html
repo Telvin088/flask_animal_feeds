@@ -80,11 +80,11 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Your Name</label>
-              <input class="form-input" type="text" name="name" placeholder="Full name" required>
+              <input class="form-input" type="text" name="name" placeholder="Full name" value="{% if user_info %}{{ user_info.username }}{% endif %}" required>
             </div>
             <div class="form-group">
               <label class="form-label">Email Address</label>
-              <input class="form-input" type="email" name="email" placeholder="your@email.com" required>
+              <input class="form-input" type="email" name="email" placeholder="your@email.com" value="{% if user_info %}{{ user_info.email }}{% endif %}" required>
             </div>
           </div>
           <div class="form-group">
